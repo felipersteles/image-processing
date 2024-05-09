@@ -19,3 +19,4 @@ Mat draw_histogram(const vector<int>& histogram, int max_lvl, int height);
 Mat match_histograms(const Mat &target, const vector<int> &source_cumalative_histogram, int max_lvl);
 Mat gauss_kernel(int kernel_size_x, int kernel_size_y, float sigma);
 Mat apply_kernel(Mat img, Mat kernel);
+Mat otsu_threshold(Mat img);

@@ -142,3 +142,13 @@ Mat apply_kernel(Mat img, Mat kernel){
     
     return result;
 }
+
+// função que aplica o otsu threshhold em uma imagem
+Mat otsu_threshold(Mat img){
+    Mat result;
+    
+    // função nativa do opencv
+    threshold(img, result, 0, 255, THRESH_BINARY | THRESH_OTSU);
+    
+    return result;
+}
