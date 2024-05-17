@@ -7,6 +7,8 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <vector>
+#include "lib.h"
+#include <chrono>
 
 using namespace cv;
 using namespace std;
@@ -151,4 +153,150 @@ Mat otsu_threshold(Mat img){
     threshold(img, result, 0, 255, THRESH_BINARY | THRESH_OTSU);
     
     return result;
+}
+
+Mat apply_blur(Mat image){
+    
+    Mat blur = image.clone();
+    
+    GaussianBlur(image, blur, Size(3,3), 0);
+    
+    return blur;
+}
+
+Mat get_sobel(Mat img_blur, SobelDirection dir){
+    Mat sobel;
+    
+    switch (dir) {
+        case x:
+            Sobel(img_blur, sobel, CV_64F, 1, 0, 5);
+            break;
+            
+        case y:
+            Sobel(img_blur, sobel, CV_64F, 0, 1, 5);            
+            break;
+            
+        default:
+            Sobel(img_blur, sobel, CV_64F, 1, 1, 5);
+            break;
+    }
+    
+    return sobel;
+}
+
+Mat get_canny(Mat img_blur){
+    // Canny edge detection
+    Mat edges;
+    
+    Canny(img_blur, edges, 100, 200, 3, false);
+    
+    return edges;
+}
+
+Mat get_laplacian(Mat img){
+    
+    // Canny laplacian detection
+    Mat laplacian;
+    Laplacian(img, laplacian, CV_64F);
+    
+    return laplacian;
+}
+
+Mat get_gradient(Mat img){
+    // Create a structuring element
+        int morph_size = 2;
+        Mat element = getStructuringElement(
+            MORPH_RECT,
+            Size(2 * morph_size + 1,
+                 2 * morph_size + 1),
+            Point(morph_size,
+                  morph_size));
+    
+        Mat output;
+      
+        // Gradient
+        morphologyEx(img, output,
+                     MORPH_GRADIENT, element,
+                     Point(-1, -1), 1);
+    
+    return output;
+}
+
+
+int yPrewittGradient(Mat image, int x, int y)
+{
+    return image.at<uchar>(y - 1, x - 1) +
+         image.at<uchar>(y - 1, x) +
+        image.at<uchar>(y - 1, x + 1) -
+        image.at<uchar>(y + 1, x - 1) -
+        image.at<uchar>(y + 1, x) -
+        image.at<uchar>(y + 1, x + 1);
+}
+
+int xPrewittGradient(cv::Mat image, int x, int y)
+{
+    return image.at<uchar>(y - 1, x - 1) +
+         image.at<uchar>(y, x - 1) +
+        image.at<uchar>(y + 1, x - 1) -
+        image.at<uchar>(y - 1, x + 1) -
+        image.at<uchar>(y, x + 1) -
+        image.at<uchar>(y + 1, x + 1);
+}
+
+Mat get_prewitt(Mat img){
+    Mat dstPrewitt = img.clone();
+    
+    for (int y = 0; y < img.rows; y++)
+            for (int x = 0; x < img.cols; x++)
+                dstPrewitt.at<uchar>(y, x) = 0.0;
+            
+    
+    int gpx,gpy,sump;
+    
+    for (int y = 1; y < img.rows - 1; y++) {
+        for (int x = 1; x < img.cols - 1; x++) {
+            
+            //Prewitt
+            gpx = xPrewittGradient(img, x, y);
+            gpy = yPrewittGradient(img, x, y);
+            sump = sqrt(powf(gpx, 2.0) + powf(gpy, 2.0));
+            sump = sump > 255 ? 255 : sump;
+            sump = sump < 0 ? 0 : sump;
+            dstPrewitt.at<uchar>(y, x) = sump;
+        }
+    }
+    
+    return dstPrewitt;
+}
+
+Mat apply_kmeans(Mat img){
+    Mat src = img.clone();
+    
+    Mat afterOtsu = otsu_threshold(src);
+    
+    Mat samples(afterOtsu.rows * afterOtsu.cols, 3, CV_32F);
+    for (int y = 0; y < afterOtsu.rows; y++)
+        for (int x = 0; x < afterOtsu.cols; x++)
+            for (int z = 0; z < 3; z++)
+                samples.at<float>(y + x*afterOtsu.rows, z) = afterOtsu.at<Vec3b>(y, x)[z];
+
+
+    int clusterCount = 5;
+    Mat labels;
+    int attempts = 5;
+    Mat centers;
+    kmeans(samples, clusterCount, labels, TermCriteria(TermCriteria::EPS + cv::TermCriteria::COUNT, 10000, 0.0001), attempts, KMEANS_PP_CENTERS, centers);
+
+
+    Mat res(afterOtsu.size(), afterOtsu.type());
+    for (int y = 0; y < afterOtsu.rows; y++)
+        for (int x = 0; x < afterOtsu.cols; x++)
+        {
+            int cluster_idx = labels.at<int>(y + x*afterOtsu.rows, 0);
+            res.at<Vec3b>(y, x)[0] = centers.at<float>(cluster_idx, 0);
+            res.at<Vec3b>(y, x)[1] = centers.at<float>(cluster_idx, 1);
+            res.at<Vec3b>(y, x)[2] = centers.at<float>(cluster_idx, 2);
+        }
+    
+    return res;
 }
