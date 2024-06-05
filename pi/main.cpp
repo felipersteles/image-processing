@@ -11,10 +11,11 @@
 using namespace cv;
 using namespace std;
 
-int main() {
+int main(int argc, char** argv) {
     
     // Carrega a imagem do experimento
-    Mat img = imread("/Users/felipeteles/Development/ufma/pi/pi/data/pancreas/1-010.jpg", IMREAD_GRAYSCALE);
+    Mat img = imread("/Users/felipeteles/Development/ufma/dataset/train/img/pancreas_095_46.png", IMREAD_GRAYSCALE);
+    Mat mask = imread("/Users/felipeteles/Development/ufma/dataset/train/mask/pancreas_095_46.png", IMREAD_GRAYSCALE);
 
     // log de erros
     if (img.empty()) {
@@ -22,14 +23,9 @@ int main() {
         return -1;
     }
     
-    Mat imgBlur = apply_blur(img);
     
-    Mat kmeans = apply_kmeans(imgBlur);
-    
-    // Exibe os resultados
-    imshow("Imagem Original", img);
-    imshow("Imagem depois do Kmeans", kmeans);
-    
+    // pancrease segmentation function
+    pancreas_segmentation(img,mask);
     
     waitKey(0);
     

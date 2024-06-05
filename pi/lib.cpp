@@ -5,13 +5,22 @@
 //  Created by Felipe Teles on 15/04/24.
 //
 #include <opencv2/opencv.hpp>
+#include <opencv2/ximgproc.hpp>
+#include <opencv2/ximgproc/segmentation.hpp>
+#include <opencv2/xfeatures2d/nonfree.hpp>
+
 #include <iostream>
 #include <vector>
-#include "lib.h"
 #include <chrono>
+
+#include "lib.h"
+#include "connected_components.h"
 
 using namespace cv;
 using namespace std;
+using namespace cv::ximgproc;
+using namespace cv::ximgproc::segmentation;
+
 
 // Função para quantizar os valores de pixel
 Mat quantize_image(Mat img,int maxLevel, int level) {
@@ -41,27 +50,39 @@ vector<int> calculate_histogram(const Mat &image, int max_lvl) {
     return histogram;
 }
 
-// Desenha o histograma de acordo com um nivel maximo e uma altura
-Mat draw_histogram(const vector<int>& histogram, int max_lvl, int height) {
-    int histSize = max_lvl;
-    int histHeight = height;
+void draw_histogram(const vector<int>& histogram, string title, int max_level, int height) {
+  // Validate input parameters
+  if (max_level <= 0 || height <= 0) {
+    cerr << "Error: max_level and height must be positive values." << endl;
+    return;
+  }
+
+  // Calculate histogram size
+  int hist_size = max_level;
     
-    Mat histImage(histHeight, histSize, CV_8UC3, Scalar(0,0,0));
+    // Find the maximum value in the histogram (optional, but useful for scaling)
+    int max_hist_value = *max_element(histogram.begin(), histogram.end());
 
-    // 1: normalizar o histograma
-    int maxHist = *max_element(histogram.begin(), histogram.end());
-    // evita divisao por zero
-    if (maxHist == 0) maxHist = 1;
+    // Avoid division by zero
+     float scale_factor = max_hist_value == 0 ? 1.0f : 1.0f / max_hist_value;
 
-    // 2: desenha a linha
-    for (int i = 0; i < histSize; i++) {
-        float binHeight = ((float)histogram[i] / maxHist) * histHeight;
-        line(histImage, Point(i, histHeight),
-             Point(i, histHeight - cvRound(binHeight)),
-             Scalar(255, 255, 255));
-    }
-    return histImage;
+    // Create histogram image
+    Mat hist_image(height, hist_size, CV_8UC3, Scalar(0, 0, 0));
+    
+  // Draw histogram bars
+  for (int i = 0; i < hist_size; ++i) {
+    float bar_height = (histogram[i] * scale_factor * max_hist_value);
+      
+      Point a = Point(i, height);
+      Point b = Point(i, height - cvRound(bar_height));
+      
+      line(hist_image, a, b, Scalar(200, 200, 200));
+  }
+
+  // Display histogram image
+  imshow(title, hist_image);
 }
+
 
 // calcula a aparicao dos valores dos pixels
 vector<int> caculate_cumulative_histogram(const Mat &image, int max_lvl) {
@@ -76,13 +97,39 @@ vector<int> caculate_cumulative_histogram(const Mat &image, int max_lvl) {
     return cumulative_histogram;
 }
 
+Mat equalize_hist(Mat img){
+    
+    // criar imagem resultante
+    Mat equalized;
+
+    // Aplica a equalização de histograma
+    equalizeHist(img, equalized);
+    
+    return equalized;
+}
+
+Mat clahe(Mat img){
+    // criar imagem resultante
+    Mat equalized;
+    
+    // Define os parâmetros da equalização de histograma adaptativa
+    int tileSize = 8;
+    int clipLimit = 32;
+    
+    cv::Size size(tileSize, clipLimit);
+    
+    // Aplica a equalização de histograma adaptativa
+    cv::createCLAHE(clipLimit, size)->apply(img, equalized);
+    
+    return equalized;
+}
+
 // Aplica a especificação do histograma com base num histograma de referencia
 Mat match_histograms(const Mat &target, const vector<int> &source_cumalative_histogram, int max_lvl) {
 
     // calcula o histograma da imagem alvo
     vector<int> target_hist = calculate_histogram(target, max_lvl);
     
-    int total_pixels = target.rows * target.cols;
     vector<uchar> lut(max_lvl, 0);
 
     // 1: comparação do valor das probabilidades
@@ -299,4 +346,110 @@ Mat apply_kmeans(Mat img){
         }
     
     return res;
+}
+
+void relabelSuperpixels(cv::Mat &labels) {
+
+    int max_label = 0;
+    for (int i = 0; i < labels.rows; i++) {
+        for (int j = 0; j < labels.cols; j++) {
+            if (labels.at<int>(i, j) > max_label) {
+                max_label = labels.at<int>(i, j);
+            }
+        }
+    }
+
+    int current_label = 0;
+    vector<int> label_correspondence(max_label + 1, -1);
+
+    for (int i = 0; i < labels.rows; i++) {
+        for (int j = 0; j < labels.cols; j++) {
+            int label = labels.at<int>(i, j);
+
+            if (label_correspondence[label] < 0) {
+                label_correspondence[label] = current_label++;
+            }
+
+            labels.at<int>(i, j) = label_correspondence[label];
+        }
+    }
+}
+
+
+Mat apply_superpixel(Mat img){
+    
+    Mat result = img.clone();
+    
+    // Set SLIC parameters
+    int region_size = 100; // Adjust for desired superpixel size
+    float regularity = 50.0; // Adjust for shape compactness
+    int num_iterations = 5;
+
+    // Create SLIC object
+    Ptr<SuperpixelSLIC> slic = createSuperpixelSLIC(result,SLIC,region_size,regularity);
+    slic->iterate(num_iterations);
+    
+    Mat labels;
+    slic->getLabels(labels);
+    
+    double t = (double) getTickCount();
+    
+    t = ((double) getTickCount() - t) / getTickFrequency();
+    cout << "SLIC"
+         << " segmentation took " << (int) (t * 1000)
+         << " ms with " << slic->getNumberOfSuperpixels() << " superpixels" << endl;
+    
+    Mat mask;
+    // get the contours for displaying
+    slic->getLabelContourMask(mask, true);
+    result.setTo(Scalar(0, 0, 255), mask);
+    
+    return result;
+}
+
+vector<KeyPoint> get_features_using_SIFT(Mat img){
+    vector<KeyPoint> keypoints;
+    Ptr<Feature2D> f2d_detector = SIFT::create();
+    f2d_detector->detect(img, keypoints);
+    
+    // Add results to image and save.
+    Mat output;
+    drawKeypoints(img, keypoints, output);
+    imshow("sift result", output);
+    
+    return keypoints;
+}
+
+void pancreas_segmentation(Mat img, Mat mask){
+    cout << "equalizar histograma" << endl
+    <<  "aplicar extracao de caracteristicas baseada em caminho" << endl
+    << "aplicar o region growing ou tecnica de segmentacao" << endl
+    << "aplicar metricas"<< endl;
+    
+    // Exibe os resultados
+    imshow("Imagem Original", img);
+    // Calcula o histograma
+    vector<int> histograma = calculate_histogram(img);
+    draw_histogram(histograma, "Histograma da imagem original");
+    
+    // Create a Mat to store the XOR result
+    Mat xor_result; // 8UC1 for single-channel (grayscale)
+
+      // Perform element-wise XOR operation using bitwise_xor
+    bitwise_xor(img, mask, xor_result);
+
+    imshow("Imagem depois do XOR", xor_result);
+    
+    Mat equalizedImg = clahe(img);
+    imshow("Equalizada", equalizedImg);
+    
+    vector<int> newHistograma = calculate_histogram(equalizedImg);
+    draw_histogram(newHistograma, "Histograma da imagem equalizada");
+    
+    // Aplicar superpixel na imagem equalizada
+    Mat blurImg = apply_blur(equalizedImg);
+    Mat superPixelImg = apply_superpixel(img);
+    imshow("Imagem depois do superpixel", superPixelImg);
+    
+    get_features_using_SIFT(superPixelImg);
 }

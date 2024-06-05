@@ -17,11 +17,12 @@ enum SobelDirection {
     xy, // Valor 2
 };
 
-vector<int> calculate_histogram(const Mat &image, int max_lvl);
+vector<int> calculate_histogram(const Mat &image, int max_lvl = 256);
 Mat quantize_image(Mat img,int maxLevel, int level);
-Mat draw_histogram(const vector<int>& histogram, int max_lvl, int height);
+void draw_histogram(const vector<int>& histogram, string title, int max_level = 256, int height = 500);
 vector<int> caculate_cumulative_histogram(const Mat &image, int max_lvl);
 Mat draw_histogram(const vector<int>& histogram, int max_lvl, int height);
+Mat equalize_hist(Mat img);
 Mat match_histograms(const Mat &target, const vector<int> &source_cumalative_histogram, int max_lvl);
 Mat gauss_kernel(int kernel_size_x, int kernel_size_y, float sigma);
 Mat apply_kernel(Mat img, Mat kernel);
@@ -33,3 +34,5 @@ Mat get_laplacian(Mat img);
 Mat get_gradient(Mat img);
 Mat get_prewitt(Mat img);
 Mat apply_kmeans(Mat img);
+void pancreas_segmentation(Mat img, Mat mask);
+
