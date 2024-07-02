@@ -15,12 +15,6 @@
 #include <dirent.h>  // For directory handling
 #include <cmath>  // for mathematical functions
 
-std::vector<std::pair<cv::Mat, cv::Mat>> load_mask_atlas(std::vector<cv::Mat> images, std::vector<cv::Mat> masks);
-std::vector<std::pair<cv::Mat, cv::Mat>> load_features_atlas(std::vector<cv::Mat> images);
-std::vector<std::pair<cv::Mat, cv::Mat>> load_bayers_atlas(std::vector<cv::Mat> images, std::vector<cv::Mat> masks);
-std::vector<std::vector<std::pair<cv::Mat, cv::Mat>>> load_all_atlas(std::vector<cv::Mat> images, std::vector<cv::Mat> masks);
-std::vector<string> loadImagesNames(const std::string& folder_path);
-
 cv::Mat reduce_mask(const cv::Mat& mask);
 cv::Mat pre_process_img(const cv::Mat& img);
 cv::Mat pos_process_img(const cv::Mat& img);

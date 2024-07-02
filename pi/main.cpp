@@ -15,10 +15,53 @@
 using namespace cv;
 using namespace std;
 
+void start_menu(Model model){
+    int menu = -1, selected_id = -1;
+    
+    cout 
+    << "Com o modelo treinado agora é possível a visualização dos resultados. " << endl
+    << "[1] Continuar." << endl
+    << "[0] Sair." << endl
+    << "Digite uma opção: ";
+    
+    cin >> menu;
+    
+    while(menu!=0){
+        cout
+        << "[1] Visualizar desempenho médio." << endl
+        << "[2] Visualizar desemepenho individual." << endl
+        << "[0] Sair." << endl
+        << "Digite uma opção: ";
+        
+        cin >> menu;
+        
+        switch (menu) {
+            case 0:
+                break;
+                
+            case 1:
+                model.show_results();
+                break;
+                
+            case 2:
+                cout<< endl <<"Digite o id do resultado: ";
+                cin >> selected_id;
+                
+                model.show_individual_result(selected_id);
+                break;
+                
+            default:
+                cout<< "Digite uma opção válida!" << endl;
+                break;
+        }
+    }
+}
+
 int main(int argc, char** argv) {
     
     // perfome the segmentation then evaluate
-        evaluate_segmentation();
+    Model model = Model();
+    start_menu(model);
     
     // Define folder paths
     //    std::string train_image_folder = "/Users/felipeteles/Development/ufma/dataset/valid/img/";

@@ -10,6 +10,7 @@
 		72123EEA2BCE0C4600FC873E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 72123EE92BCE0C4600FC873E /* main.cpp */; };
 		7212409F2BCE1D5000FC873E /* lib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7212409E2BCE1D5000FC873E /* lib.cpp */; };
 		7242909F2C11E5CA00162819 /* pancreas_segmentation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7242909D2C11E5CA00162819 /* pancreas_segmentation.cpp */; };
+		724CBA042C34BE30000D8E87 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 724CBA022C34BE30000D8E87 /* utils.cpp */; };
 		72705B5D2BF819C2003D52C2 /* libopencv_rapid.4.9.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72705B262BF819C0003D52C2 /* libopencv_rapid.4.9.0.dylib */; };
 		72705B5E2BF819C2003D52C2 /* libopencv_freetype.4.9.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72705B272BF819C0003D52C2 /* libopencv_freetype.4.9.0.dylib */; };
 		72705B5F2BF819C2003D52C2 /* libopencv_wechat_qrcode.4.9.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72705B282BF819C0003D52C2 /* libopencv_wechat_qrcode.4.9.0.dylib */; };
@@ -65,7 +66,6 @@
 		72705B912BF819C2003D52C2 /* libopencv_calib3d.4.9.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72705B5A2BF819C2003D52C2 /* libopencv_calib3d.4.9.0.dylib */; };
 		72705B922BF819C2003D52C2 /* libopencv_xobjdetect.4.9.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72705B5B2BF819C2003D52C2 /* libopencv_xobjdetect.4.9.0.dylib */; };
 		72705B932BF819C2003D52C2 /* libopencv_ml.4.9.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72705B5C2BF819C2003D52C2 /* libopencv_ml.4.9.0.dylib */; };
-		7287D7B72C20B74B008BE59F /* evaluation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7287D7B52C20B74B008BE59F /* evaluation.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -87,6 +87,8 @@
 		7212409E2BCE1D5000FC873E /* lib.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lib.cpp; sourceTree = "<group>"; };
 		7242909D2C11E5CA00162819 /* pancreas_segmentation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = pancreas_segmentation.cpp; sourceTree = "<group>"; };
 		7242909E2C11E5CA00162819 /* pancreas_segmentation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = pancreas_segmentation.hpp; sourceTree = "<group>"; };
+		724CBA022C34BE30000D8E87 /* utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utils.cpp; sourceTree = "<group>"; };
+		724CBA032C34BE30000D8E87 /* utils.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = utils.hpp; sourceTree = "<group>"; };
 		72705B262BF819C0003D52C2 /* libopencv_rapid.4.9.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_rapid.4.9.0.dylib; path = ../../../../../opt/homebrew/Cellar/opencv/4.9.0_8.reinstall/lib/libopencv_rapid.4.9.0.dylib; sourceTree = "<group>"; };
 		72705B272BF819C0003D52C2 /* libopencv_freetype.4.9.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_freetype.4.9.0.dylib; path = ../../../../../opt/homebrew/Cellar/opencv/4.9.0_8.reinstall/lib/libopencv_freetype.4.9.0.dylib; sourceTree = "<group>"; };
 		72705B282BF819C0003D52C2 /* libopencv_wechat_qrcode.4.9.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_wechat_qrcode.4.9.0.dylib; path = ../../../../../opt/homebrew/Cellar/opencv/4.9.0_8.reinstall/lib/libopencv_wechat_qrcode.4.9.0.dylib; sourceTree = "<group>"; };
@@ -142,7 +144,6 @@
 		72705B5A2BF819C2003D52C2 /* libopencv_calib3d.4.9.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_calib3d.4.9.0.dylib; path = ../../../../../opt/homebrew/Cellar/opencv/4.9.0_8.reinstall/lib/libopencv_calib3d.4.9.0.dylib; sourceTree = "<group>"; };
 		72705B5B2BF819C2003D52C2 /* libopencv_xobjdetect.4.9.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_xobjdetect.4.9.0.dylib; path = ../../../../../opt/homebrew/Cellar/opencv/4.9.0_8.reinstall/lib/libopencv_xobjdetect.4.9.0.dylib; sourceTree = "<group>"; };
 		72705B5C2BF819C2003D52C2 /* libopencv_ml.4.9.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_ml.4.9.0.dylib; path = ../../../../../opt/homebrew/Cellar/opencv/4.9.0_8.reinstall/lib/libopencv_ml.4.9.0.dylib; sourceTree = "<group>"; };
-		7287D7B52C20B74B008BE59F /* evaluation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = evaluation.cpp; sourceTree = "<group>"; };
 		7287D7B62C20B74B008BE59F /* evaluation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = evaluation.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -286,12 +287,13 @@
 		72123EE82BCE0C4600FC873E /* pi */ = {
 			isa = PBXGroup;
 			children = (
+				724CBA022C34BE30000D8E87 /* utils.cpp */,
+				724CBA032C34BE30000D8E87 /* utils.hpp */,
 				72123EE92BCE0C4600FC873E /* main.cpp */,
 				7242909D2C11E5CA00162819 /* pancreas_segmentation.cpp */,
 				7242909E2C11E5CA00162819 /* pancreas_segmentation.hpp */,
 				7212409D2BCE1D3600FC873E /* lib.h */,
 				7212409E2BCE1D5000FC873E /* lib.cpp */,
-				7287D7B52C20B74B008BE59F /* evaluation.cpp */,
 				7287D7B62C20B74B008BE59F /* evaluation.hpp */,
 			);
 			path = pi;
@@ -355,9 +357,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				7242909F2C11E5CA00162819 /* pancreas_segmentation.cpp in Sources */,
+				724CBA042C34BE30000D8E87 /* utils.cpp in Sources */,
 				72123EEA2BCE0C4600FC873E /* main.cpp in Sources */,
 				7212409F2BCE1D5000FC873E /* lib.cpp in Sources */,
-				7287D7B72C20B74B008BE59F /* evaluation.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
