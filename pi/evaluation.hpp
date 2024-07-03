@@ -111,7 +111,8 @@ public:
         std::cout << "| Loading atlas. " << std::endl;
         std::cout << "|------------------------------------------------------|" << std::endl;
         
-        std::vector<std::pair<Mat, Mat>> atlas = load_mask_atlas(train_images, train_masks);
+        std::vector<std::pair<Mat, Mat>> mask_atlas = load_mask_atlas(train_images, train_masks);
+//        std::vector<std::pair<Mat, Mat>> feature_atlas = load_features_atlas(train_images);
         
         // Define folder paths
         std::string valid_image_folder = "/Users/felipeteles/Development/ufma/dataset/test/img/";
@@ -143,7 +144,7 @@ public:
             cv::Mat mask = this->masks[i];
             string name = this->names[i];
             
-            cv::Mat output = map_segmentation(image, atlas);
+            cv::Mat output = map_segmentation(image, mask_atlas);
             
             // Calculate segmentation metrics here (e.g., Jaccard Index, Dice Coefficient, Specificity)
             float jaccard_index_pair = calculate_jaccard_index(output, mask);

@@ -41,15 +41,6 @@ cv::Mat pre_process_img(const cv::Mat& img){
     cv::Mat image_equalized = equalize_hist(image);
     Mat image_unsharp = unsharp(image_equalized);
     
-    cv::Mat binary = otsu_threshold(image_unsharp);
-    //
-    //    // Define the kernel (structuring element)
-    //    // Here, creating a 3x3 rectangular kernel
-    Mat kernel = Mat::ones(3, 3, CV_8U);
-    //
-    //  Perform closing
-    Mat result = closing(binary, kernel, 2);
-    
     return image_unsharp;
 }
 
@@ -146,7 +137,6 @@ cv::Mat map_segmentation(cv::Mat& img,
                          std::vector<std::pair<Mat, Mat>> mask_atlas) {
     
     Mat image_preprocessed = pre_process_img(img);
-    Mat image_descriptor = extract_SIFT_features(image_preprocessed);
     
     // Find the most similar image-mask pair in the atlas based on image similarity
     double min_distance = std::numeric_limits<double>::max();
@@ -159,10 +149,7 @@ cv::Mat map_segmentation(cv::Mat& img,
         // Calculate image similarity metric (consider alternatives like normalized cross-correlation)
         double distance = cv::norm(image_preprocessed, mask, cv::NORM_L1); // L1 norm for simplicity
         
-        // Heuristic 1: Check similarity and minimum intensity difference (consider adaptive thresholding)
-        double intensity_diff = std::abs(cv::mean(image_preprocessed)[0] - cv::mean(mask)[0]);
-        double intensity_threshold = 10; // Adjust based on your data
-        if (distance < min_distance && intensity_diff > intensity_threshold) {
+        if (distance < min_distance) {
             min_distance = distance;
             best_idx = (int) i;
         }
@@ -179,7 +166,8 @@ cv::Mat map_segmentation(cv::Mat& img,
         Mat pos_processed_img = pos_process_img(img);
         for (int y = 0; y < pos_processed_img.rows; ++y) {
             for (int x = 0; x < pos_processed_img.cols; ++x) {
-                if(mask.at<uchar>(y,x) > 0
+                if(
+                   mask.at<uchar>(y,x) > 0
                    && pos_processed_img.at<uchar>(y,x) > 0
                    && verify_neighbors(pos_processed_img, y, x)
                    ){
@@ -189,8 +177,8 @@ cv::Mat map_segmentation(cv::Mat& img,
             }
         }
     } else {
-        // Handle the entire image without a good match (consider different background handling strategies)
-        segmentation_mask = cv::Scalar(0); // Assign background value (optional: explore background modeling)
+        segmentation_mask = cv::Scalar(0);
+        std::cout << "| [Info]: Not found." << std::endl;
     }
     
     

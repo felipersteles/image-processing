@@ -57,3 +57,4 @@ Mat region_growing(const Mat& anImage,
                   unsigned char anInValue = 255,
                   float tolerance = 5);
 Mat select_area(const Mat& binary_image, const Point& seed_point);
+Mat process_mask(Mat img, Mat mask);

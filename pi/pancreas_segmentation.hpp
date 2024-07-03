@@ -20,8 +20,8 @@ cv::Mat pre_process_img(const cv::Mat& img);
 cv::Mat pos_process_img(const cv::Mat& img);
 
 cv::Mat map_segmentation(cv::Mat& img,
-                         std::vector<std::pair<Mat, Mat>> mask_atlas);
+                         std::vector<std::pair<Mat, Mat>> mask_atlas
+                         );
 
-std::vector<cv::Mat> loadImages(const std::string& folder_path, string name);
 
 #endif /* pancreas_segmentation_hpp */

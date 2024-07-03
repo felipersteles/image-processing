@@ -181,6 +181,20 @@ Mat gauss_kernel(int kernel_size_x, int kernel_size_y, float sigma){
     
     return kernel;
 }
+// função que aplica o kernel em uma imagem
+Mat process_mask(Mat image, Mat mask){
+    
+    // Create masked image
+      cv::Mat masked_image;
+      cv::bitwise_and(image, image, masked_image, mask);
+
+      // Optional: Combine with background (replace with your background image)
+      cv::Mat background = cv::Mat::zeros(image.size(), image.type());  // Black background
+      cv::Mat result;
+      cv::addWeighted(masked_image, 1.0, background, 0.0, 0.0, result);
+
+      return result;
+}
 
 // função que aplica o kernel em uma imagem
 Mat apply_kernel(Mat img, Mat kernel){

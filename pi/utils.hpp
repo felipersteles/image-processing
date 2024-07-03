@@ -23,6 +23,7 @@ std::vector<std::pair<cv::Mat, cv::Mat>> load_features_atlas(std::vector<cv::Mat
 std::vector<std::pair<cv::Mat, cv::Mat>> load_bayers_atlas(std::vector<cv::Mat> images, std::vector<cv::Mat> masks);
 std::vector<std::vector<std::pair<cv::Mat, cv::Mat>>> load_all_atlas(std::vector<cv::Mat> images, std::vector<cv::Mat> masks);
 std::vector<string> loadImagesNames(const std::string& folder_path);
+std::vector<cv::Mat> loadImages(const std::string& folder_path, string name);
 
 
 float calculate_specificity(const cv::Mat& segmentation_mask, const cv::Mat& ground_truth_mask);

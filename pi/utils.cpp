@@ -113,6 +113,7 @@ std::vector<std::pair<cv::Mat, cv::Mat>> load_mask_atlas(std::vector<cv::Mat> im
     // Combine images and masks into the atlas
     for (size_t i = 0; i < images.size(); ++i) {
         cv::Mat img = pre_process_img(images[i]);
+        
         atlas.push_back(std::make_pair(img, masks[i]));
     }
     
