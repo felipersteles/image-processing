@@ -342,3 +342,91 @@ float calculate_recall(const cv::Mat& segmentation_mask, const cv::Mat& ground_t
     float recall = static_cast<float>(true_positives) / total_ground_truth_foreground;
     return recall;
 }
+
+/**
+ * Calculates the precision for image segmentation based on Jaccard Index.
+ *
+ * @param segmentation_mask The predicted segmentation mask (single-channel CV_8UC1 Mat).
+ * @param ground_truth_mask The ground truth mask (single-channel CV_8UC1 Mat).
+ *
+ * @return The precision value (float between 0 and 1).
+ */
+float calculate_precision(const cv::Mat& segmentation_mask, const cv::Mat& ground_truth_mask) {
+    // Check if masks have the same size
+    if (segmentation_mask.size() != ground_truth_mask.size()) {
+      CV_Error(Error::StsBadArg, "Segmented and ground truth masks must have the same size");
+    }
+
+    int truePositives = 0;
+    int allPositives = 0;
+
+    // Iterate through each pixel
+    for (int y = 0; y < segmentation_mask.rows; y++) {
+      for (int x = 0; x < segmentation_mask.cols; x++) {
+        uchar segmentedPixel = segmentation_mask.at<uchar>(y, x);
+        uchar groundTruthPixel = ground_truth_mask.at<uchar>(y, x);
+
+        // Count true positives (correctly classified foreground pixels)
+        if (segmentedPixel > 0 && groundTruthPixel > 0) {
+          truePositives++;
+        }
+
+        // Count all predicted foreground pixels
+        if (segmentedPixel > 0) {
+          allPositives++;
+        }
+      }
+    }
+
+    // Calculate precision (if no foreground pixels predicted, avoid division by zero)
+    float precision = allPositives > 0 ? (float)truePositives / allPositives : 0.0f;
+
+    return precision;
+}
+
+float calculate_accuracy(const Mat& segmented_image, const Mat& real_mask) {
+  // Ensure data type compatibility (assuming CV_8UC1 for both)
+  if (segmented_image.type() != CV_8UC1 || real_mask.type() != CV_8UC1 ||
+      segmented_image.size() != real_mask.size()) {
+    std::cerr << "Error: Incompatible data types or image sizes." << std::endl;
+    return -1.0f; // Indicate error with a float value
+  }
+
+  int true_positives = 0;
+  int true_negatives = 0;
+
+  for (int y = 0; y < segmented_image.rows; ++y) {
+    for (int x = 0; x < segmented_image.cols; ++x) {
+      uchar segmented_pixel = segmented_image.at<uchar>(y, x);
+      uchar real_pixel = real_mask.at<uchar>(y, x);
+
+      // True positive: correctly classified foreground pixel
+      if (segmented_pixel == 255 && real_pixel == 255) {
+        true_positives++;
+      }
+      // True negative: correctly classified background pixel
+      else if (segmented_pixel == 0 && real_pixel == 0) {
+        true_negatives++;
+      }
+    }
+  }
+
+  // Calculate accuracy (overall classification correctness)
+  float accuracy = 0.0f;
+  int total_pixels = segmented_image.rows * segmented_image.cols;
+  if (total_pixels > 0) {
+    accuracy = static_cast<float>(true_positives + true_negatives) / static_cast<float>(total_pixels);
+  }
+
+  return accuracy;
+}
+
+void cut_image(cv::Mat image, const cv::Mat atlas){
+    for (int y = 0; y < image.rows; ++y) {
+        for (int x = 0; x < image.cols; ++x) {
+            if(atlas.at<uchar>(x,y) == 0){
+                image.at<uchar>(x,y) = 0;
+            }
+        }
+    }
+}

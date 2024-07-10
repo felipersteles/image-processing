@@ -741,43 +741,54 @@ void exploreConnected(int x, int y, Mat& segmented_image) {
 
 Mat select_area(const Mat& img, const Point& seed_point) {
     
-    Mat binary_image = get_canny(img, 100, 200);
+    Mat edge_image = get_canny(img, 100, 200);
+    
     
     // Check if input is a single-channel binary image
-    if (binary_image.channels() != 1 || binary_image.depth() != CV_8U) {
+    if (edge_image.channels() != 1 || edge_image.depth() != CV_8U) {
         std::cerr << "Error: Input image must be a single-channel binary image (CV_8UC1)" << std::endl;
         return Mat();
     }
     
     // Check if seed point is within image bounds
-    if (seed_point.x < 0 || seed_point.x >= binary_image.cols ||
-        seed_point.y < 0 || seed_point.y >= binary_image.rows) {
+    if (seed_point.x < 0 || seed_point.x >= edge_image.cols ||
+        seed_point.y < 0 || seed_point.y >= edge_image.rows) {
         std::cerr << "Error: Seed point is outside image bounds!" << std::endl;
         return Mat();
     }
     
-    Mat segmented_image = binary_image.clone();
+    Mat segmented_image = edge_image.clone();
     
-//    imshow("binary_image", binary_image);
-//    waitKey(0);
+    imshow("binary_image", edge_image);
+    waitKey(0);
     
     // Flood fill starting from the seed point
     floodFill(segmented_image, seed_point, 255);
     
-//    imshow("floodFill", segmented_image);
-//    waitKey(0);
+    imshow("floodFill", segmented_image);
+    waitKey(0);
     
     // Invert the segmentation result to remove the filled area (becomes 0)
     bitwise_not(segmented_image, segmented_image);
+    imshow("not", segmented_image);
+    waitKey(0);
     
     // Combine the inverted segmentation with the original image
     // to get the desired result (only seed pixel's area remains)
-    bitwise_xor(binary_image, segmented_image,segmented_image);
+    bitwise_xor(edge_image, segmented_image,segmented_image);
+    imshow("xor", segmented_image);
+    waitKey(0);
+    
     bitwise_not(segmented_image, segmented_image);
+    imshow("not after xor", segmented_image);
+    waitKey(0);
     
     // fix mask
     Mat closing_kernel = Mat::ones(5,5, CV_8U);
     Mat result = closing(segmented_image, closing_kernel, 2);
+    
+    imshow("result", result);
+    waitKey(0);
     
     return result;
 }

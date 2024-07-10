@@ -30,6 +30,8 @@ public:
     float jaccard_index;
     float specificity;
     float recall;
+    float precision;
+    float accuracy;
     
     Result(){};
     
@@ -40,17 +42,21 @@ public:
            float dice,
            float jaccard_index,
            float specificity,
-           float recall
+           float recall,
+           float precision,
+           float accuracy
            ){
         this->id = id;
         
         this->name = name;
-        this-> img = img;
+        this->img = img;
         
-        this-> dice = dice;
-        this-> jaccard_index = jaccard_index;
-        this-> specificity = specificity;
-        this-> recall = recall;
+        this->dice = dice;
+        this->jaccard_index = jaccard_index;
+        this->specificity = specificity;
+        this->recall = recall;
+        this->precision = precision;
+        this->accuracy = accuracy;
     };
     
     Mat get(){
@@ -59,6 +65,8 @@ public:
         std::cout << "|-- -- -- -- -- -- -- --/" << std::endl;
         std::cout << "| Image name: " << this->name << std::endl;
         std::cout << "|-- -- -- -- -- -- -- --/" << std::endl;
+        std::cout << "| Accuracy: " << this->accuracy << std::endl;
+        std::cout << "| Precision: " << this->precision << std::endl;
         std::cout << "| Jaccard Index: " << this->jaccard_index << std::endl;
         std::cout << "| Dice Coefficient: " << this->dice << std::endl;
         std::cout << "| Specificity: " << this->specificity << std::endl;
@@ -82,6 +90,8 @@ public:
     float jaccard_index;
     float specificity;
     float recall;
+    float precision;
+    float accuracy;
     
     Model(){
         
@@ -112,6 +122,7 @@ public:
         std::cout << "|------------------------------------------------------|" << std::endl;
         
         std::vector<std::pair<Mat, Mat>> mask_atlas = load_mask_atlas(train_images, train_masks);
+        cv:Mat prob_atlas = get_atlas(train_masks);
 //        std::vector<std::pair<Mat, Mat>> feature_atlas = load_features_atlas(train_images);
         
         // Define folder paths
@@ -136,6 +147,8 @@ public:
         this->dice_coefficient = 0.0f;
         this->specificity = 0.0f;
         this->recall = 0.0f;
+        this->precision = 0.0f;
+        this->accuracy = 0.0f;
         
         // Loop through each image-mask pair
         int img_count = 0;
@@ -144,24 +157,30 @@ public:
             cv::Mat mask = this->masks[i];
             string name = this->names[i];
             
-            cv::Mat output = map_segmentation(image, mask_atlas);
+            cv::Mat output = map_segmentation(image, mask_atlas, prob_atlas);
             
             // Calculate segmentation metrics here (e.g., Jaccard Index, Dice Coefficient, Specificity)
             float jaccard_index_pair = calculate_jaccard_index(output, mask);
             float dice_coefficient_pair = calculate_dice_coefficient(output, mask);
             float specificity_pair = calculate_specificity(output, mask); // Assuming you have a function for specificity
-            float  recall_pair = calculate_recall(output, mask);
+            float recall_pair = calculate_recall(output, mask);
+            float precision_pair = calculate_precision(output, mask);
+            float accuracy_pair = calculate_accuracy(output, mask);
             
             // Update overall metrics (consider averaging across all image-mask pairs)
             this->jaccard_index += jaccard_index_pair;
             this->dice_coefficient += dice_coefficient_pair;
             this->specificity += specificity_pair;
             this->recall += recall_pair;
+            this->precision += precision_pair;
+            this->accuracy += accuracy_pair;
             
             // Print the report of metrics
             std::cout << "| Image name: " << name << std::endl;
             std::cout << "| Image index: " << img_count << std::endl;
             std::cout << "|-- -- -- -- -- -- -- --/" << std::endl;
+            std::cout << "| Accuracy: " << accuracy_pair << std::endl;
+            std::cout << "| Precision: " << precision_pair << std::endl;
             std::cout << "| Jaccard Index: " << jaccard_index_pair << std::endl;
             std::cout << "| Dice Coefficient: " << dice_coefficient_pair << std::endl;
             std::cout << "| Specificity: " << specificity_pair << std::endl;
@@ -169,6 +188,8 @@ public:
             std::cout << "|-- -- -- -- -- -- -- --/" << std::endl;
             std::cout << "| Avarage metrics       |" << std::endl;
             std::cout << "|-- -- -- -- -- -- -- --/" << std::endl;
+            std::cout << "| Accuracy: " << this->accuracy / (img_count + 1)  << std::endl;
+            std::cout << "| Precision: " << this->precision / (img_count + 1) << std::endl;
             std::cout << "| Jaccard Index: " << this->jaccard_index / (img_count + 1) << std::endl;
             std::cout << "| Dice Coefficient: " << this->dice_coefficient / (img_count + 1) << std::endl;
             std::cout << "| Specificity: " << this->specificity / (img_count + 1) << std::endl;
@@ -177,7 +198,7 @@ public:
             std::cout << "| Missing: "<< this->images.size() - (img_count + 1) << std::endl;
             std::cout << "|------------------------------------------------------|" << std::endl;
             
-            Result result = Result((int) i, name, output, dice_coefficient_pair, jaccard_index_pair, specificity_pair, recall_pair);
+            Result result = Result((int) i, name, output, dice_coefficient_pair, jaccard_index_pair, specificity_pair, recall_pair, precision_pair, accuracy_pair);
             this->results.push_back(result);
             img_count++;
         }
@@ -188,6 +209,8 @@ public:
             this->dice_coefficient /= this->images.size();
             this->specificity /= this->images.size();
             this->recall /= this->images.size();
+            this->precision /= this->images.size();
+            this->accuracy /= this->images.size();
         }
         
         // Print or store the calculated metrics (e.g., Jaccard Index, Dice Coefficient, Specificity)
@@ -196,6 +219,8 @@ public:
         std::cout << "|------------------------------|" << std::endl;
         std::cout << "| Final results: " << std::endl;
         std::cout << "|-- -- -- -- -- -- -- --/" << std::endl;
+        std::cout << "| Accuracy: " << this->accuracy << std::endl;
+        std::cout << "| Precision: " << this->precision << std::endl;
         std::cout << "| Jaccard Index: " << this->jaccard_index << std::endl;
         std::cout << "| Dice Coefficient: " << this->dice_coefficient << std::endl;
         std::cout << "| Specificity: " << this->specificity << std::endl;
@@ -236,6 +261,7 @@ public:
         std::cout << "|-- -- -- -- -- -- -- --/" << std::endl;
         std::cout << "| Final results:        |" << std::endl;
         std::cout << "|-- -- -- -- -- -- -- --/" << std::endl;
+        std::cout << "| Precision: " << this->precision << std::endl;
         std::cout << "| Jaccard Index: " << this->jaccard_index << std::endl;
         std::cout << "| Dice Coefficient: " << this->dice_coefficient << std::endl;
         std::cout << "| Specificity: " << this->specificity << std::endl;
