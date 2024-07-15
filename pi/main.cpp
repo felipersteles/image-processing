@@ -17,6 +17,7 @@
 using namespace cv;
 using namespace std;
 
+// analyze project
 void start_menu(Model model){
     int menu = -1, selected_id = -1;
     
@@ -59,6 +60,7 @@ void start_menu(Model model){
     }
 }
 
+// test function
 Mat perform_segmentation(Mat image){
     
     std::string train_image_folder = "/Users/felipeteles/Development/ufma/dataset/train/img/";
@@ -82,45 +84,6 @@ int main(int argc, char** argv) {
     // perfome the segmentation then evaluate
     Model model = Model();
     start_menu(model);
-
-
-    // Test image
-//    string image_name = "pancreas_004_59.png";
-//    cout << endl << "Selecione a imagem: ";
-//    cin >> image_name;
-//    see_image(image_name);
-//
-//    cv::Mat pre_img = pre_process_img(img);
-//    cv::Mat pos_img = pos_process_img(img);
-//    cv::Mat use_mask = reduce_mask(mask);
-//    cv::Mat processed_mask = process_mask(pre_img, mask);
-
-//    cv::Mat output;
-//    bool find;
-//    for (int y = 0; y < pos_img.rows; ++y) {
-//        for (int x = 0; x < pos_img.cols; ++x) {
-//            if(use_mask.at<uchar>(y,x) > 0 && pos_img.at<uchar>(y,x) > 0 && verify_neighbors(pos_img, y, x)){
-//                std::cout << "| [Info]: Pancreas found on pixel(" << x <<", "<< y <<")." << std::endl;
-//                output = select_area(pos_img, Point(x, y));
-//                find = true;
-//                break;
-//            }
-//        }
-//        
-//        if(find) break;
-//    }
-    
-//    Mat output = perform_segmentation(img);
-//    
-//    imshow("Image", img);
-//    imshow("Mask", mask);
-//    imshow("Pre processamento", pre_img);
-//    imshow("Mask processada", processed_mask);
-//    imshow("Mask reduzida", use_mask);
-//    imshow("Pos processamento", pos_img);
-//    imshow("Segmentation", output);
-//    
-//    waitKey(0);
     
     return 0;
 }

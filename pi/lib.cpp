@@ -759,36 +759,36 @@ Mat select_area(const Mat& img, const Point& seed_point) {
     
     Mat segmented_image = edge_image.clone();
     
-    imshow("binary_image", edge_image);
-    waitKey(0);
+//    imshow("binary_image", edge_image);
+//    waitKey(0);
     
     // Flood fill starting from the seed point
     floodFill(segmented_image, seed_point, 255);
     
-    imshow("floodFill", segmented_image);
-    waitKey(0);
+//    imshow("floodFill", segmented_image);
+//    waitKey(0);
     
     // Invert the segmentation result to remove the filled area (becomes 0)
     bitwise_not(segmented_image, segmented_image);
-    imshow("not", segmented_image);
-    waitKey(0);
+//    imshow("not", segmented_image);
+//    waitKey(0);
     
     // Combine the inverted segmentation with the original image
     // to get the desired result (only seed pixel's area remains)
     bitwise_xor(edge_image, segmented_image,segmented_image);
-    imshow("xor", segmented_image);
-    waitKey(0);
+//    imshow("xor", segmented_image);
+//    waitKey(0);
     
     bitwise_not(segmented_image, segmented_image);
-    imshow("not after xor", segmented_image);
-    waitKey(0);
+//    imshow("not after xor", segmented_image);
+//    waitKey(0);
     
     // fix mask
     Mat closing_kernel = Mat::ones(5,5, CV_8U);
     Mat result = closing(segmented_image, closing_kernel, 2);
     
-    imshow("result", result);
-    waitKey(0);
+//    imshow("result", result);
+//    waitKey(0);
     
     return result;
 }
