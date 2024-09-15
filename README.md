@@ -1,5 +1,5 @@
 
-<div align="center"><img src="https://wahooart.com/Art.nsf/O/7YUDJ7/$File/Pieter-Bruegel-The-Elder-Two-Chained-Monkeys.JPG" height="300" width="100%"/></div>
+<div align="center"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_%28Winter%29_-_Google_Art_Project.jpg/1200px-Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_%28Winter%29_-_Google_Art_Project.jpg" height="300" width="100%"/></div>
 
 # Image processing
 
