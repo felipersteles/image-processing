@@ -1,3 +1,6 @@
+
+<div align="center"><img src="https://wahooart.com/Art.nsf/O/7YUDJ7/$File/Pieter-Bruegel-The-Elder-Two-Chained-Monkeys.JPG" height="300" width="100%"/></div>
+
 # Image processing
 
 Image processing is a vast field concerned with manipulating, analyzing, and understanding digital images. It involves various techniques to enhance image quality, extract features, and gain insights from visual data. Here's a breakdown of key aspects:
